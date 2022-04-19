@@ -1,0 +1,24 @@
+{
+  "name": "alps-drive",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lafcha/alps-drive.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lafcha/alps-drive/issues"
+  },
+  "homepage": "https://github.com/lafcha/alps-drive#readme",
+  "dependencies": {
+    "express": "^4.17.3"
+  },
+  "type": "module"
+}
