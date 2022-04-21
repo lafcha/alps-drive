@@ -23,8 +23,8 @@ export function displayFile(path){
 }
 
 export function checkFileOrDirectory (path){
-
-    return fs.stat(path, (err, stats)=> {
+    return fs.stat(path)
+    .then(stats => {
         return stats.isDirectory()
       })
 }

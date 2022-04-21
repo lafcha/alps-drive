@@ -24,12 +24,10 @@ app.get('/api/drive', (req, res) => {
 
 app.get('/api/drive/:name', (req, res) => {
 
-
   const name = req.params.name;
   const path = './data/'+ name;
 
 drive.checkFileOrDirectory(path)
-  .then (display => console.log(display))
   .then(responseFileOrDirectory => {
     if (responseFileOrDirectory) {
       drive.getFilesFromDir(path)
