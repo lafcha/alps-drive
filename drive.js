@@ -15,16 +15,27 @@ export function filesToAlpfiles(dirents) {
     })
 }
 
-export function displayFile(path){
+export function displayFile(path) {
     return fs.readFile(path, (err, data) => {
-      return data 
-      });
+        return data
+    });
 
 }
 
-export function checkFileOrDirectory (path){
+export function checkFileOrDirectory(path) {
     return fs.stat(path)
-    .then(stats => {
-        return stats.isDirectory()
-      })
+        .then(stats => {
+            return stats.isDirectory()
+        })
+}
+
+export async function createNeWDirectory(path, name) {
+
+    try  {
+       await fs.mkdir(path + name)
+        return true
+    }
+    catch(error) {
+        throw error
+    }
 }
