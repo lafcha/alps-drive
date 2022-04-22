@@ -39,3 +39,8 @@ export async function createNeWDirectory(path, name) {
         throw error
     }
 }
+
+export function regexTest(input){
+    const regex = new RegExp("^[a-zA-Z0-9]*$");
+    return regex.test(input);
+}

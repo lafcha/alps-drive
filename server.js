@@ -50,26 +50,45 @@ app.post('/api/drive', (req, res) => {
   const folderName = req.query.name;
   const path = './data/';
 
-  const regex = new RegExp("^[a-zA-Z0-9]*$");
-
-  let regexMatch = regex.test(folderName);
+  let regexMatch = regexTest(folderName);
 
   if (regexMatch) {
     drive.createNeWDirectory(path, folderName)
-      .then(()=>res.status(201).redirect('back'))
-      .catch(()=>res.status(400).send('Le dossier existe déjà'))
+      .then(() => res.status(201).redirect('back'))
+      .catch(() => res.status(400).send('Le dossier existe déjà'))
 
   } else {
-      res.status(400).send("Le format du nom du fichier non valide")
+    res.status(400).send("Le format du nom du fichier non valide")
   }
+});
+
+app.post("/api/drive/:folder",  async (req, res) => {
+
+  const parentFolder = req.params.folder;
+  const newFolder = req.query.name;
+  const path = './data/';
+  const newFolderPath = path + parentFolder +'/';
+
+  let regexTest = drive.regexTest(newFolder);
+
+  let result = await fs.stat(path + parentFolder);
+
+  if (result.isDirectory()) {
+    if (regexTest) {
+      drive.createNeWDirectory(newFolderPath, newFolder)
+      .then(() => res.status(201).redirect('back'))
+      .catch(() => res.status(400).send('Le dossier existe déjà'))
+
+    } else {
+      res.status(400).send("Le format du nom du fichier non valide")
+    }
+
+  } else {
+    res.status(404).send("Le dossier parent n'existe pas")
+  }
+});
 
 
-
-
-
-
-
-})
 
 function start() {
   app.listen(port, () => {
