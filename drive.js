@@ -6,7 +6,6 @@ export function getFilesFromDir(path) {
 }
 
 export function filesToAlpfiles(dirents) {
-
     return dirents.map(dirent => {
         return {
             name: dirent.name,
@@ -43,4 +42,8 @@ export async function createNeWDirectory(path, name) {
 export function regexTest(input){
     const regex = new RegExp("^[a-zA-Z0-9]*$");
     return regex.test(input);
+}
+
+export function deleteFileOrDirectory(path){
+   return fs.rm(path,{recursive:true})
 }
