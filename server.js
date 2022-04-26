@@ -3,20 +3,22 @@ import express from 'express';
 import { cp } from 'fs';
 import fs from 'fs/promises';
 import * as drive from './drive.js';
-import bb from 'express-busboy';
+import fu from 'express-fileupload';
+import { Buffer } from 'buffer';
+
 
 
 const app = express();
 const port = 3000;
-bb.extend(app, {
-  upload: true,
-  path: './data/',
-  allowedPath: /./
-});
 
 app.use(express.json());
 app.use('/', express.static('frontend'));
+app.use(fu({
+  createParentPath: true,
+}));
 
+
+/*** DISPLAY FILES & FOLDERS ***/
 app.get('/api/drive', (req, res) => {
 
   const path = './data';
@@ -51,6 +53,7 @@ app.get('/api/drive/:name', (req, res) => {
 });
 
 
+/*** CREATE FILES & FOLDERS ***/
 app.post('/api/drive', (req, res) => {
 
   const folderName = req.query.name;
@@ -94,6 +97,7 @@ app.post("/api/drive/:folder", async (req, res) => {
   }
 });
 
+/*** DELETE FILES & FOLDERS ***/
 app.delete("/api/drive/:name", async (req, res) => {
   const name = req.params.name;
   const path = "./data/";
@@ -115,7 +119,7 @@ app.delete("/api/drive/:name", async (req, res) => {
 });
 
 
-app.delete("/api/drive/:folder/:name", async (req, res)=> {
+app.delete("/api/drive/:folder/:name", async (req, res) => {
   const name = req.params.name;
   const folder = req.params.folder;
   const path = "./data/";
@@ -133,11 +137,55 @@ app.delete("/api/drive/:folder/:name", async (req, res)=> {
   } else {
     res.status(400).send("Le format du nom du fichier non valide")
   }
-
-
 })
 
+/*** UPLOAD FILES ***/
+app.put("/api/drive/", (req, res) => {
 
+  if (!req.files || Object.keys(req.files).length === 0) {
+    return res.status(400).send('No files were uploaded.');
+  };
+
+  let file = req.files.file;
+  let uploadedPath = "./data/" + file.name;
+
+  file.mv(uploadedPath, (err) => {
+    if (err) {
+      return res.status(500).send(err);
+    }
+    return res.status(201);
+  });
+  const path = './data/';
+  drive.getFilesFromDir(path)
+    .then(files => drive.filesToAlpfiles(files))
+    .then(alpfiles => res.status(200).send(alpfiles))
+
+});
+
+app.put("/api/drive/:folder", (req, res) => {
+
+  if (!req.files || Object.keys(req.files).length === 0) {
+    return res.status(400).send('No files were uploaded.');
+  };
+
+
+  let folder = req.params.folder;
+  let file = req.files.file;
+  let uploadedPath = "./data/" + folder + '/'+ file.name;
+
+  file.mv(uploadedPath, (err) => {
+    if (err) {
+      return res.status(500).send(err);
+    }
+    return res.status(201);
+  });
+
+  const path = './data/';
+  drive.getFilesFromDir(path)
+    .then(files => drive.filesToAlpfiles(files))
+    .then(alpfiles => res.status(200).send(alpfiles))
+
+});
 
 function start() {
   app.listen(port, () => {

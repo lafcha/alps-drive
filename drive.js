@@ -16,6 +16,7 @@ export function filesToAlpfiles(dirents) {
 
 export function displayFile(path) {
     return fs.readFile(path, (err, data) => {
+        console.log(data)
         return data
     });
 
@@ -31,7 +32,7 @@ export function checkFileOrDirectory(path) {
 export async function createNeWDirectory(path, name) {
 
     try  {
-       await fs.mkdir(path + name)
+    await fs.mkdir(path + name)
         return true
     }
     catch(error) {
@@ -45,5 +46,5 @@ export function regexTest(input){
 }
 
 export function deleteFileOrDirectory(path){
-   return fs.rm(path,{recursive:true})
+return fs.rm(path,{recursive:true})
 }
