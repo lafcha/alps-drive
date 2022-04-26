@@ -5,28 +5,30 @@ export function getFilesFromDir(path) {
     return fs.readdir(path, { withFileTypes: true })
 }
 
-export function filesToAlpfiles(dirents) {
+export function filesToAlpfiles(dirents, path) {
     return dirents.map(dirent => {
-        return {
-            name: dirent.name,
-            isFolder: dirent.isDirectory()
+        if (dirent.isDirectory()){
+            return {
+                name: dirent.name,
+                isFolder: dirent.isDirectory()
+            }
+        } else {
+            let pathFile = path + "/" + dirent.name;
+            return getFileInfo(pathFile)
+            .then((size)=>{
+                return {
+                    name: dirent.name,
+                    isFolder: dirent.isDirectory(),
+                    size : size
+                }
+            }
+            )
         }
     })
 }
 
-export function displayFile(path) {
-    return fs.readFile(path, (err, data) => {
-        console.log(data)
-        return data
-    });
-
-}
-
-export function checkFileOrDirectory(path) {
-    return fs.stat(path)
-        .then(stats => {
-            return stats.isDirectory()
-        })
+export async function getFileInfo(path){
+return fs.stat(path).then((stat)=>stat.size)
 }
 
 export async function createNeWDirectory(path, name) {

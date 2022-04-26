@@ -22,11 +22,12 @@ app.use(fu({
 app.get('/api/drive', (req, res) => {
 
   const path = './data';
+  
   drive.getFilesFromDir(path)
-    .then(files => drive.filesToAlpfiles(files))
-    .then(alpfiles => res.status(200).send(alpfiles))
+    .then(files => Promise.all(drive.filesToAlpfiles(files, path)))
+    .then(alpfiles => res.status(200).send(alpfiles) )
     .catch(error => {
-      res.sendStatus(400, "Le dossier n'existe pas")
+      res.sendStatus(404, "Le dossier ou le fichier n'existe pas")
     })
 
 });
@@ -36,17 +37,9 @@ app.get('/api/drive/:name', (req, res) => {
   const name = req.params.name;
   const path = './data/' + name;
 
-  drive.checkFileOrDirectory(path)
-    .then(responseFileOrDirectory => {
-      if (responseFileOrDirectory) {
-        drive.getFilesFromDir(path)
-          .then(files => drive.filesToAlpfiles(files))
-          .then(alpfiles => res.status(200).send(alpfiles))
-      } else {
-        drive.displayFile(path)
-          .then(file => res.status(200).send(file))
-      }
-    })
+  drive.getFilesFromDir(path)
+    .then(files => Promise.all(drive.filesToAlpfiles(files, path)))
+    .then(alpfiles => res.status(200).send(alpfiles) )
     .catch(error => {
       res.sendStatus(404, "Le dossier ou le fichier n'existe pas")
     })
@@ -171,7 +164,7 @@ app.put("/api/drive/:folder", (req, res) => {
 
   let folder = req.params.folder;
   let file = req.files.file;
-  let uploadedPath = "./data/" + folder + '/'+ file.name;
+  let uploadedPath = "./data/" + folder + '/' + file.name;
 
   file.mv(uploadedPath, (err) => {
     if (err) {
